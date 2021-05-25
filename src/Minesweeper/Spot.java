@@ -4,22 +4,25 @@ import java.util.Random;
 
 public class Spot {
 	int x, y;
-	private final boolean MINE;
+	private boolean mine;
 	private boolean isRevealed;
 	private boolean isFlagged;
-	private int mineValue;
+	private boolean mineLostTo;
+	private static boolean hasMineExploded = false;
+	int mineValue;
 	
 	public Spot(int x, int y) {
 		this.x = x;
 		this.y = y;
-		this.MINE = new Random().nextBoolean();
+		this.mine = false;
 		this.isRevealed = false;
+		this.mineLostTo = false;
 		this.isFlagged = false;
 		this.mineValue = 0;
 	}
 	
 	public boolean isMine() {
-		return this.MINE;
+		return this.mine;
 	}
 	
 	public boolean isRevealed() {
@@ -27,7 +30,7 @@ public class Spot {
 	}
 	
 	public void reveal() {
-		System.out.println(this + " reveal");
+		//System.out.println(this + " reveal");
 		this.isRevealed = true;
 	}
 
@@ -46,10 +49,25 @@ public class Spot {
 	public int getMineValue() {
 		return this.mineValue;
 	}
+	
+	public void arm() {
+		this.mine = true;
+	}
+	
+	public boolean isMineLostTo() {
+		return this.mine && this.mineLostTo;
+	}
 
+	public void mineGoBoom() {
+		if (hasMineExploded)
+			return;
+
+		hasMineExploded = true;
+		this.mineLostTo = true;
+	}
+	
 	@Override
 	public String toString(){
 		return "Tile(" + x + "," + y + ",revealed=" + this.isRevealed + ",flagged=" + this.isFlagged + ")";
 	}
-	
 }
