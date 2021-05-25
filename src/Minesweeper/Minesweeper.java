@@ -127,7 +127,6 @@ public class Minesweeper extends JPanel implements ActionListener {
 							g2d.fillRect(spot.x * DIM, spot.y * DIM, DIM, DIM);
 						}
 						
-						
 						g2d.drawImage(MINE_IMAGE, spot.x * DIM + DIM / 4, spot.y * DIM + DIM / 4, null);
 						//this.removeMouseListener(this.gameController);
 					} else {
@@ -201,6 +200,7 @@ public class Minesweeper extends JPanel implements ActionListener {
 	
 	public void flagSpot(int x, int y) {
 		//System.out.println((this.spots[y][x].isFlagged() ? "Unflagged " : "Flagged ") + this.spots[y][x]);
+		if (this.spots[y][x].isRevealed()) return;
 		this.spots[y][x].toggleFlag();
 	}
 }

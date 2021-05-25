@@ -35,6 +35,7 @@ public class Spot {
 	}
 
 	public void toggleFlag() {
+		if (this.isRevealed) return;
 		this.isFlagged = !this.isFlagged;
 	}
 	

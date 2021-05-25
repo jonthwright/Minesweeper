@@ -5,19 +5,19 @@ import java.util.Queue;
 import java.util.Stack;
 
 public class RevealAlgos {
-	private final static Pair[] NEIGHBOURS = {new Pair(-1, 0), new Pair(1, 0), new Pair(0, -1), new Pair(0, 1)};
-	
 	public static void DFSRecursive(final int X, final int Y, final Spot[][] SPOTS) {
 		if (!validCoord(X, Y, SPOTS)) return;
 		if (SPOTS[Y][X].isMine()) return;
 		if (SPOTS[Y][X].isRevealed()) return;
 		
 		SPOTS[Y][X].reveal();
-
 		if (!isZeroMineNeighbour(SPOTS[Y][X])) return;
 		
-		for (final Pair NEIGHBOUR : NEIGHBOURS) {
-			DFSRecursive(X + NEIGHBOUR.first, Y + NEIGHBOUR.second, SPOTS);
+		for (int i = -1; i < 2; ++i) {
+ 			for (int j = -1; j < 2; ++j) {
+ 				if (i == 0 && j == 0) continue;
+				DFSRecursive(X + j, Y + i, SPOTS);
+			}
 		}
 	}
 	
@@ -40,14 +40,17 @@ public class RevealAlgos {
 			
 			if (!isZeroMineNeighbour(SPOTS[Y_CURR][X_CURR])) continue;
 
-			for (final Pair NEIGHBOUR : NEIGHBOURS) {
-				final int OFFSET_X = X_CURR + NEIGHBOUR.first, OFFSET_Y = Y_CURR + NEIGHBOUR.second;
-				
-				if (validCoord(OFFSET_X, OFFSET_Y, SPOTS) && !visited[OFFSET_Y][OFFSET_X] &&
-						!SPOTS[OFFSET_Y][OFFSET_X].isRevealed() && !SPOTS[OFFSET_Y][OFFSET_X].isMine() ) {
-						
-					stack.add(new Pair(OFFSET_X, OFFSET_Y));
-					visited[OFFSET_Y][OFFSET_X] = true;
+			for (int i = -1; i < 2; ++i) {
+				for (int j = -1; j < 2; ++j) {
+					if (i == 0 && j == 0) continue;
+					final int OFFSET_X = X_CURR + j, OFFSET_Y = Y_CURR + i;
+					
+					if (validCoord(OFFSET_X, OFFSET_Y, SPOTS) && //!visited[OFFSET_Y][OFFSET_X] &&
+							!SPOTS[OFFSET_Y][OFFSET_X].isRevealed() && !SPOTS[OFFSET_Y][OFFSET_X].isMine() ) {
+							
+						stack.add(new Pair(OFFSET_X, OFFSET_Y));
+						//visited[OFFSET_Y][OFFSET_X] = true;
+					}
 				}
 			}
 		}
@@ -55,13 +58,14 @@ public class RevealAlgos {
 
 	public static void BFSIterative(final int X, final int Y, final Spot[][] SPOTS) {
 		Queue<Pair> q = new LinkedList<>();
+		q.add(new Pair(X, Y));
+		
 		boolean[][] visited = new boolean[SPOTS.length][SPOTS[0].length];
 		
 		for (int i = 0; i < visited.length; ++i)
 			for (int j = 0; j < visited[0].length; ++j)
 				visited[i][j] = false;
 		
-		q.add(new Pair(X, Y));
 		visited[Y][X] = true;
 		
 		while (!q.isEmpty()) {
@@ -72,14 +76,16 @@ public class RevealAlgos {
 			
 			if (!isZeroMineNeighbour(SPOTS[Y_CURR][X_CURR])) continue;
 
-			for (final Pair NEIGHBOUR : NEIGHBOURS) {
-				final int OFFSET_X = X_CURR + NEIGHBOUR.first, OFFSET_Y = Y_CURR + NEIGHBOUR.second;
-				
-				if (validCoord(OFFSET_X, OFFSET_Y, SPOTS) && !visited[OFFSET_Y][OFFSET_X] &&
-						!SPOTS[OFFSET_Y][OFFSET_X].isRevealed() && !SPOTS[OFFSET_Y][OFFSET_X].isMine()) {
+			for (int i = -1; i < 2; ++i) {
+				for (int j = -1; j < 2; ++j) {
+					if (i == 0 && j == 0) continue;
+					final int OFFSET_X = X_CURR + j, OFFSET_Y = Y_CURR + i;
+					if (validCoord(OFFSET_X, OFFSET_Y, SPOTS) && //!visited[OFFSET_Y][OFFSET_X] &&
+							!SPOTS[OFFSET_Y][OFFSET_X].isRevealed() && !SPOTS[OFFSET_Y][OFFSET_X].isMine()) {
 						
-					q.add(new Pair(OFFSET_X, OFFSET_Y));
-					visited[OFFSET_Y][OFFSET_X] = true;
+						q.add(new Pair(OFFSET_X, OFFSET_Y));
+						//visited[OFFSET_Y][OFFSET_X] = true;
+					}
 				}
 			}
 		}
@@ -93,4 +99,3 @@ public class RevealAlgos {
 		return !(X < 0 || Y < 0 || X >= SPOTS[0].length || Y >= SPOTS.length);
 	}
 }
-
