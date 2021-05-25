@@ -17,8 +17,7 @@ public class Minesweeper extends JPanel implements ActionListener {
 	private Spot[][] spots;
 	private Timer timer;
 	private int minesNum = 99;
-	private Image flagImage;
-	private Image mineImage;
+	private int selectedX, selectedY;
 	
 	public Minesweeper(GameController gameController) {
 		this.timer = new Timer(0, this);
@@ -106,7 +105,7 @@ public class Minesweeper extends JPanel implements ActionListener {
 		
 		final int DIM = this.getPreferredSize().width / this.spots.length;
 		
-		final Image FLAG_IMAGE = flagImage = Toolkit.getDefaultToolkit().
+		final Image FLAG_IMAGE = Toolkit.getDefaultToolkit().
 				getImage(Minesweeper.class.getResource("/resources/flag_open_tilted_20x20.png"));
 		final Image MINE_IMAGE = Toolkit.getDefaultToolkit().
 				getImage(Minesweeper.class.getResource("/resources/mine_gs_20x20.png"));
