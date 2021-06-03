@@ -5,202 +5,207 @@ import javax.swing.Timer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 public class Minesweeper extends JPanel implements ActionListener {
 	
-	private GAME_STATE gameState;
-	private final GameController gameController;
-	private Spot[][] spots;
-	private Timer timer;
-	private int minesNum = 99;
-	private int selectedX, selectedY;
+	private Cell[][] cells;
+	private Image FLAG_IMAGE, MINE_IMAGE, EXPLOSION_IMAGE;
+	private Image[] NUMBER_IMAGES;
+	private final GameController CONTROLLER;
 	
 	public Minesweeper(GameController gameController) {
-		this.timer = new Timer(0, this);
-		this.timer.start();
+		Timer timer = new Timer(0, this);
+		timer.start();
 		
-		this.setPreferredSize(new Dimension(24*30, 24*30));
-		this.gameController = gameController;
-		this.gameState = GAME_STATE.RUNNING;
+		int numX = 24;
+		int numY = 24;
+		
+		this.setPreferredSize(new Dimension(numX * 30 + 1, numY * 30 + 1));
 
-		newGame();
+		newGame(numX, numY, 99);
+		loadImages(20);
 		
-		for (Spot[] spotR : this.spots) {
-			for (Spot spot : spotR) {
-				System.out.print((spot.isMine() ? "*" : spot.mineValue) + " ");
-			}
-			System.out.println();
-		}
-		
-		this.addMouseListener(this.gameController);
+		this.addMouseListener(this.CONTROLLER = gameController);
+		this.addKeyListener(this.CONTROLLER);
+		this.addMouseMotionListener(this.CONTROLLER);
 		this.setFocusable(true);
 		this.setFocusTraversalKeysEnabled(false);
+		
 	}
 	
-	private void newGame(){
-		generateGame();
-		generateMines();
+	private void newGame(int xSpots, int ySpots, int numOfMines){
+		generateGame(xSpots, ySpots);
+		generateMines(numOfMines);
 		generateSpotValue();
 	}
 	
-	private void generateGame() {
-		int xSpotsNum = this.gameController.getTileX();
-		int ySpotsNum = this.gameController.getTileY();
-		this.spots = new Spot[ySpotsNum][xSpotsNum];
-		
-		for (int i = 0; i < this.spots.length; ++i) {
-			for (int j = 0; j < this.spots[i].length; ++j) {
-				this.spots[i][j] = new Spot(j, i);
+	private void generateGame(int xSpots, int ySpots) {
+		this.cells = new Cell[ySpots][xSpots];
+		Cell.SafeSpots = 0;
+		Cell.MinesExploded = false;
+
+		for (int i = 0; i < this.cells.length; ++i) {
+			for (int j = 0; j < this.cells[i].length; ++j) {
+				this.cells[i][j] = new Cell(j, i);
 			}
 		}
 	}
 	
-	private void generateMines() {
+	private void generateMines(int numOfMines) {
 		int minesPlaced = 0;
-		boolean[][] bombsPlaced = new boolean[this.spots.length][this.spots[0].length];
+		boolean[][] minesArmed = new boolean[this.cells.length][this.cells[0].length];
 		Random rand = new Random();
-		while (minesPlaced < this.minesNum) {
-			final int X_RAND = rand.nextInt(bombsPlaced[0].length);
-			final int Y_RAND = rand.nextInt(bombsPlaced.length);
+		
+		while (minesPlaced < numOfMines) {
+			final int X_RAND = rand.nextInt(minesArmed[0].length);
+			final int Y_RAND = rand.nextInt(minesArmed.length);
 
-			if (!bombsPlaced[Y_RAND][X_RAND]) {
-				this.spots[Y_RAND][X_RAND].arm();
-				bombsPlaced[Y_RAND][X_RAND] = true;
+			if (!cells[Y_RAND][X_RAND].isArmed()) {
+				this.cells[Y_RAND][X_RAND].arm();
 				minesPlaced++;
 			}
 		}
 	}
 	
 	private void generateSpotValue() {
-		for (int i = 0; i < this.spots.length; ++i) {
-			for (int j = 0; j < this.spots[i].length; ++j) {
-				if (this.spots[i][j].isMine()) {
+		for (int i = 0; i < this.cells.length; ++i) {
+			for (int j = 0; j < this.cells[i].length; ++j) {
+				if (this.cells[i][j].isArmed()) {
 					
-					for (int offSetX = -1; offSetX < 2; ++offSetX) {
-						for (int offSetY = -1; offSetY < 2; ++offSetY) {
-							final int X = j + offSetX, Y = i + offSetY;
+					for (int offX = -1; offX < 2; ++offX) {
+						for (int offY = -1; offY < 2; ++offY) {
+							final int X_ = j + offX, Y_ = i + offY;
 							
-							if (!(offSetX == 0 && offSetY == 0) && validCoord(X, Y)
-									&& this.spots[i][j].isMine() && !this.spots[Y][X].isMine()) this.spots[Y][X].mineValue++;
+							if (!(offX == 0 && offY == 0) && validCoords(X_, Y_) && this.cells[i][j].isArmed() &&
+									!this.cells[Y_][X_].isArmed())
+								this.cells[Y_][X_].mineValue++;
 							
 						}
 					}
-					
 				}
 			}
 		}
 	}
 	
-	private boolean validCoord(final int X, final int Y) {
-		return !(X < 0 || Y < 0 || X >= this.spots[0].length || Y >= this.spots.length);
+	private void loadImages(int imageDim) {
+		String resourcePath = "/resources";
+		this.FLAG_IMAGE = Toolkit.getDefaultToolkit().
+				getImage(Minesweeper.class.getResource(String.format("%s/misc/flag_%dx%d.png", resourcePath, imageDim, imageDim)));
+		this.MINE_IMAGE = Toolkit.getDefaultToolkit().
+				getImage(Minesweeper.class.getResource(String.format("%s/misc/mine_%dx%d.png", resourcePath, imageDim, imageDim)));
+		this.EXPLOSION_IMAGE = Toolkit.getDefaultToolkit().
+				getImage(Minesweeper.class.getResource(String.format("%s/misc/explosion_%dx%d.png", resourcePath, imageDim, imageDim)));
+		
+		this.NUMBER_IMAGES = new Image[8];
+		for (int i = 0; i < 8;)
+			this.NUMBER_IMAGES[i++] = Toolkit.getDefaultToolkit().
+											getImage(Minesweeper.class.getResource(String.format("%s/numbers/pix/number%d_%dx%d.png",
+													resourcePath, i, imageDim, imageDim)));
+	}
+	
+	private boolean validCoords(final int X, final int Y) {
+		return X >= 0 && Y >= 0 && Y < this.cells.length && X < this.cells[Y].length;
 	}
 	
 	public void paintComponent(Graphics gfx) {
 		super.paintComponent(gfx);
 		Graphics2D g2d = (Graphics2D) gfx;
 		
-		final int DIM = this.getPreferredSize().width / this.spots.length;
+		final int DIM = this.getPreferredSize().width / this.cells.length;
+		int drawX, drawY;
 		
-		final Image FLAG_IMAGE = Toolkit.getDefaultToolkit().
-				getImage(Minesweeper.class.getResource("/resources/flag_open_tilted_20x20.png"));
-		final Image MINE_IMAGE = Toolkit.getDefaultToolkit().
-				getImage(Minesweeper.class.getResource("/resources/mine_gs_20x20.png"));
-
-
-		for (Spot[] spotRow : this.spots) {
-			for (Spot spot : spotRow) {
-				if (!spot.isRevealed()) {
-					if (spot.isFlagged()) {
-						
-						g2d.drawImage(FLAG_IMAGE, spot.x * DIM + DIM / 4, spot.y * DIM + DIM / 4, null);
-					}
-					g2d.setColor(Color.WHITE);
-					g2d.drawRect(spot.x * DIM, spot.y * DIM, DIM, DIM);
-				} else {
-					if (spot.isMine()) {
-						if (spot.isMineLostTo()) {
-							g2d.setColor(Color.RED);
-							g2d.fillRect(spot.x * DIM, spot.y * DIM, DIM, DIM);
-						}
-						
-						g2d.drawImage(MINE_IMAGE, spot.x * DIM + DIM / 4, spot.y * DIM + DIM / 4, null);
-						//this.removeMouseListener(this.gameController);
-					} else {
-						g2d.setColor(Color.GRAY);
-						g2d.fillRect(spot.x * DIM, spot.y * DIM, DIM, DIM);
-					}
-				}
+		for (Cell[] spotRow : this.cells) {
+			for (Cell cell : spotRow) {
+				drawX = DIM * cell.x + DIM * 3 / 16;
+				drawY = DIM * cell.y + DIM * 3 / 16;
 				
-				if (spot.mineValue > 0 && !spot.isMine() && !spot.isFlagged() && spot.isRevealed()) {
-					//g2d.setColor(Color.BLACK);
-					//drawCentredString(g2d, String.valueOf(spot.mineValue), spot.x * DIM, spot.y * DIM, DIM, DIM);
-					final Image NUMBER_IMAGE = Toolkit.getDefaultToolkit().getImage(
-							Minesweeper.class.getResource("/resources/numbers/col/transparent_number" + spot.mineValue + "_20x20.png"));
-					g2d.drawImage(NUMBER_IMAGE, spot.x * DIM + DIM / 4, spot.y * DIM + DIM / 4, null);
+				g2d.setColor(Color.WHITE);
+				g2d.drawRect(cell.x * DIM, cell.y * DIM, DIM, DIM);
+				
+				if (cell.isFlagged()) {
+					g2d.drawImage(this.FLAG_IMAGE, drawX, drawY, null);
+				} else if (cell.isArmed() && (Cell.MinesExploded || Cell.SafeSpots == 0)) {
+					g2d.drawImage(Cell.MinesExploded ? this.EXPLOSION_IMAGE : this.MINE_IMAGE, drawX, drawY, null);
+					this.removeMouseListener(this.CONTROLLER);
+				} else if (cell.isRevealed()) {
+					g2d.setColor(Color.GRAY);
+					g2d.fillRect(cell.x * DIM, cell.y * DIM,
+							DIM + (cell.x == this.cells[cell.y].length - 1 ? 1 : 0),
+							DIM + (cell.y == this.cells.length - 1 ? 1 : 0));
 					
-				}
+					if (cell.x == this.cells[cell.y].length - 1)
+						drawX += 1;
+					if (cell.y == this.cells.length - 1)
+						drawY += 1;
+					if (cell.mineValue > 0)
+						g2d.drawImage(this.NUMBER_IMAGES[cell.mineValue - 1], drawX, drawY, null);
+ 				}
 			}
-		}
-	}
-	
-	private void drawCentredString(final Graphics2D g2d, final String string, int x, int y, int WIDTH, int HEIGHT) {
-		FontMetrics fm = g2d.getFontMetrics(g2d.getFont());
-		
-		Rectangle2D rect = fm.getStringBounds(string, g2d);
-		
-		final int TEXT_WIDTH = (int) rect.getWidth(), TEXT_HEIGHT = (int) rect.getHeight();
-		int TEXT_POS_X = x + (WIDTH - TEXT_WIDTH) / 2;
-		int TEXT_POS_Y = y + (HEIGHT - TEXT_HEIGHT) / 2 + fm.getAscent();
-		
-		g2d.drawString(string, TEXT_POS_X, TEXT_POS_Y);
-	}
-	
-	public void update() {
-		if (this.gameState == GAME_STATE.RUNNING) {
-		
-		}
-		
-		if (this.gameState == GAME_STATE.GAME_OVER) {
-		
-		}
-
-		if (this.gameState == GAME_STATE.GAME_COMPLETED) {
-		
 		}
 	}
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		repaint();
-		update();
 	}
 	
 	public void selectSpot(int x, int y) {
-		//System.out.println("Selected " + this.spots[y][x]);
-
-		if (this.spots[y][x].isRevealed())
+		if (!validCoords(x, y)) return;
+		
+		if (this.cells[y][x].isRevealed())
 			return;
 		
-		if (!this.spots[y][x].isMine()) RevealAlgos.DFSIterative(x, y, this.spots);
+		if (!this.cells[y][x].isArmed()) {
+			RevealAlgorithms.BFSIterative(x, y, this.cells);
+			if (Cell.SafeSpots == 0)
+				System.out.println("Game Completed :)!");
+			
+		}
 		
-		this.spots[y][x].reveal();
-		if (this.spots[y][x].isMine()) {
-			this.spots[y][x].mineGoBoom();
-			for (int i = 0; i < this.spots.length; ++i)
-				for (int j = 0; j < this.spots[i].length; ++j)
-					if (this.spots[i][j].isMine())
-						this.spots[i][j].reveal();
+		this.cells[y][x].reveal();
+		
+		if (this.cells[y][x].isArmed()) {
+			this.cells[y][x].minesGoBoom();
+			System.out.println("Mines go boom :(...");
+			
+			for (Cell[] spotRow : this.cells) {
+				for (Cell cell : spotRow) {
+					if (cell.isArmed()) cell.reveal();
+				}
+			}
 		}
 		
 	}
 	
-	public void flagSpot(int x, int y) {
-		//System.out.println((this.spots[y][x].isFlagged() ? "Unflagged " : "Flagged ") + this.spots[y][x]);
-		if (this.spots[y][x].isRevealed()) return;
-		this.spots[y][x].toggleFlag();
+	public void toggleFlagSpot(int x, int y) {
+		if (!validCoords(x, y)) return;
+		if (this.cells[y][x].isRevealed()) return;
+		this.cells[y][x].toggleFlag();
 	}
+	
+	public int numberOfSpots() {
+		return this.cells.length * this.cells[0].length;
+	}
+	
+	public void _newGame(int gameDifficulty) {
+		if (this.getMouseListeners().length == 0)
+			this.addMouseListener(this.CONTROLLER);
+
+		int xSize, ySize, mineCount;
+		if (gameDifficulty == 1) {
+			xSize = ySize = mineCount = 10;
+		} else if (gameDifficulty == 2) {
+			xSize = ySize = 16;
+			mineCount = 40;
+		} else {
+			xSize = ySize = 24;
+			mineCount = 99;
+		}
+		
+		//this.setPreferredSize(new Dimension(xSize * 30, ySize * 30));
+		newGame(xSize, ySize, mineCount);
+		loadImages(this.getPreferredSize().width / xSize * 2 / 3);
+	}
+	
 }

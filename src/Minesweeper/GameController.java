@@ -3,18 +3,17 @@ package Minesweeper;
 import javax.swing.*;
 import javax.swing.event.MouseInputListener;
 import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 
-public class GameController extends JFrame implements MouseInputListener {
+public class GameController extends JFrame implements MouseInputListener, KeyListener, MouseMotionListener {
 	private final Minesweeper MINESWEEPER;
-	private int tileX;
-	private int tileY;
-	public final static int DIM = 30;
+	public static int DIM = 30;
+	private int currDiff = 3;
 	
 	public GameController() {
-		this.tileX = 24;
-		this.tileY = 24;
-	
 		this.MINESWEEPER = new Minesweeper(this);
 		this.setTitle("Minesweeper");
 		this.add(this.MINESWEEPER);
@@ -23,8 +22,8 @@ public class GameController extends JFrame implements MouseInputListener {
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		this.setIconImage(Toolkit.getDefaultToolkit().
-				getImage(GameController.class.getResource("/resources/minesweeper.png")));
-		
+				getImage(GameController.class.getResource("/resources/icons/mine_ex_icon.png")));
+		this.setResizable(false);
 		this.setVisible(true);
 		this.pack();
 	}
@@ -36,13 +35,12 @@ public class GameController extends JFrame implements MouseInputListener {
 	
 	@Override
 	public void mousePressed(MouseEvent e) {
-		final int X_MOUSE = e.getX() / this.DIM;
-		final int Y_MOUSE = e.getY() / this.DIM;
-
-		if (e.getButton() == MouseEvent.BUTTON1) {
-			this.MINESWEEPER.selectSpot(X_MOUSE, Y_MOUSE);
-		} else if (e.getButton() == MouseEvent.BUTTON3) {
-			this.MINESWEEPER.flagSpot(X_MOUSE, Y_MOUSE);
+		final int X_MOUSE = e.getX() / DIM;
+		final int Y_MOUSE = e.getY() / DIM;
+		
+		switch (e.getButton()) {
+			case MouseEvent.BUTTON1 -> this.MINESWEEPER.selectSpot(X_MOUSE, Y_MOUSE);
+			case MouseEvent.BUTTON2, MouseEvent.BUTTON3 -> this.MINESWEEPER.toggleFlagSpot(X_MOUSE, Y_MOUSE);
 		}
 	}
 	
@@ -53,7 +51,7 @@ public class GameController extends JFrame implements MouseInputListener {
 	
 	@Override
 	public void mouseEntered(MouseEvent e) {
-	
+
 	}
 	
 	@Override
@@ -68,14 +66,30 @@ public class GameController extends JFrame implements MouseInputListener {
 	
 	@Override
 	public void mouseMoved(MouseEvent e) {
-	
+		//System.out.println(e.getX() + "," + e.getY());
+		
 	}
 	
-	public int getTileX() {
-		return this.tileX;
+	@Override
+	public void keyTyped(KeyEvent key) {
+
 	}
 	
-	public int getTileY() {
-		return this.tileY;
+	@Override
+	public void keyPressed(KeyEvent key) {
+		
+		switch (key.getKeyCode()) {
+			case KeyEvent.VK_NUMPAD0, KeyEvent.VK_0 -> this.MINESWEEPER._newGame(this.currDiff);
+			case KeyEvent.VK_NUMPAD1, KeyEvent.VK_1 -> this.MINESWEEPER._newGame(this.currDiff = 1);
+			case KeyEvent.VK_NUMPAD2, KeyEvent.VK_2 -> this.MINESWEEPER._newGame(this.currDiff = 2);
+			case KeyEvent.VK_NUMPAD3, KeyEvent.VK_3 -> this.MINESWEEPER._newGame(this.currDiff = 3);
+		}
+		
+		DIM = (int) (this.MINESWEEPER.getPreferredSize().width/ Math.sqrt(this.MINESWEEPER.numberOfSpots()));
+	}
+	
+	@Override
+	public void keyReleased(KeyEvent key) {
+	
 	}
 }

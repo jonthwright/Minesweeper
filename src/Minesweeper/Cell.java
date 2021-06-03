@@ -1,27 +1,25 @@
 package Minesweeper;
 
-import java.util.Random;
-
-public class Spot {
+public class Cell {
 	int x, y;
+	int mineValue;
 	private boolean mine;
 	private boolean isRevealed;
 	private boolean isFlagged;
-	private boolean mineLostTo;
-	private static boolean hasMineExploded = false;
-	int mineValue;
+	public static boolean MinesExploded;
+	public static int SafeSpots = 0;
 	
-	public Spot(int x, int y) {
+	public Cell(int x, int y) {
 		this.x = x;
 		this.y = y;
 		this.mine = false;
 		this.isRevealed = false;
-		this.mineLostTo = false;
 		this.isFlagged = false;
 		this.mineValue = 0;
+		SafeSpots++;
 	}
 	
-	public boolean isMine() {
+	public boolean isArmed() {
 		return this.mine;
 	}
 	
@@ -30,8 +28,9 @@ public class Spot {
 	}
 	
 	public void reveal() {
-		//System.out.println(this + " reveal");
+		if (this.isRevealed) return;
 		this.isRevealed = true;
+		SafeSpots--;
 	}
 
 	public void toggleFlag() {
@@ -43,28 +42,14 @@ public class Spot {
 		return this.isFlagged;
 	}
 	
-	public void setMineValue(int mineValue) {
-		this.mineValue = mineValue;
-	}
-	
-	public int getMineValue() {
-		return this.mineValue;
-	}
-	
 	public void arm() {
 		this.mine = true;
+		SafeSpots--;
 	}
 	
-	public boolean isMineLostTo() {
-		return this.mine && this.mineLostTo;
-	}
-
-	public void mineGoBoom() {
-		if (hasMineExploded)
-			return;
-
-		hasMineExploded = true;
-		this.mineLostTo = true;
+	public void minesGoBoom() {
+		if (MinesExploded) return;
+		MinesExploded = true;
 	}
 	
 	@Override
