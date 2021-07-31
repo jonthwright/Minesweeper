@@ -6,8 +6,7 @@ public class Cell {
 	private boolean mine;
 	private boolean isRevealed;
 	private boolean isFlagged;
-	public static boolean MinesExploded;
-	public static int SafeSpots = 0;
+	public static int SafeCells = 0;
 	
 	public Cell(int x, int y) {
 		this.x = x;
@@ -16,7 +15,7 @@ public class Cell {
 		this.isRevealed = false;
 		this.isFlagged = false;
 		this.mineValue = 0;
-		SafeSpots++;
+		SafeCells++;
 	}
 	
 	public boolean isArmed() {
@@ -30,7 +29,7 @@ public class Cell {
 	public void reveal() {
 		if (this.isRevealed) return;
 		this.isRevealed = true;
-		SafeSpots--;
+		SafeCells--;
 	}
 
 	public void toggleFlag() {
@@ -44,12 +43,7 @@ public class Cell {
 	
 	public void arm() {
 		this.mine = true;
-		SafeSpots--;
-	}
-	
-	public void minesGoBoom() {
-		if (MinesExploded) return;
-		MinesExploded = true;
+		SafeCells--;
 	}
 	
 	@Override
