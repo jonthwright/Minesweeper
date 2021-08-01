@@ -28,6 +28,7 @@ public class Cell {
 	
 	public void reveal() {
 		if (this.isRevealed) return;
+
 		this.isRevealed = true;
 		SafeCells--;
 	}
@@ -48,6 +49,7 @@ public class Cell {
 	
 	@Override
 	public String toString(){
-		return "Tile(" + x + "," + y + ",revealed=" + this.isRevealed + ",flagged=" + this.isFlagged + ")";
+		final String CLASS_NAME = this.getClass().getSimpleName();
+		return CLASS_NAME + "(" + x + "," + y + ", revealed=" + this.isRevealed + ", flagged=" + this.isFlagged + ")";
 	}
 }

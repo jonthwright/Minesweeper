@@ -9,8 +9,13 @@ class Coordinates {
 		this.y = y;
 	}
 	
+	public int hashCode() {
+		return this.x * 101839 + this.y * 328897;
+	}
+	
 	@Override
 	public String toString() {
-		return "Coordinates(" + this.x + "," + this.y + ")";
+		final String CLASS_NAME = this.getClass().getSimpleName();
+		return CLASS_NAME + "(" + this.x + "," + this.y + ")";
 	}
 }

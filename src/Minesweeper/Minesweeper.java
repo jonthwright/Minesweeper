@@ -5,8 +5,8 @@ import javax.swing.Timer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.LinkedList;
-import java.util.Random;
+import java.util.*;
+
 
 public class Minesweeper extends JPanel implements ActionListener {
 	
@@ -57,18 +57,18 @@ public class Minesweeper extends JPanel implements ActionListener {
 		Random rand = new Random();
 		
 		while (minesPlaced < numOfMines) {
-			final int X_RAND = rand.nextInt(this.cells[0].length);
-			final int Y_RAND = rand.nextInt(this.cells.length);
+			final int Y = rand.nextInt(this.cells.length);
+			final int X = rand.nextInt(this.cells[Y].length);
 			
-			if (!this.cells[Y_RAND][X_RAND].isArmed()) {
-				this.cells[Y_RAND][X_RAND].arm();
+			if (!this.cells[Y][X].isArmed()) {
+				this.cells[Y][X].arm();
 				
-				for (int offX = -1; offX < 2; ++offX) {
-					for (int offY = -1; offY < 2; ++offY) {
-						final int X_NEIGH = X_RAND + offX;
-						final int Y_NEIGH = Y_RAND + offY;
+				for (int i = -1; i < 2; ++i) {
+					for (int j = -1; j < 2; ++j) {
+						final int X_NEIGH = X + i;
+						final int Y_NEIGH = Y + j;
 						
-						if (!(offX == 0 && offY == 0) && validCoords(X_NEIGH, Y_NEIGH))
+						if (validCoords(X_NEIGH, Y_NEIGH))
 							this.cells[Y_NEIGH][X_NEIGH].mineValue++;
 					}
 				}
@@ -97,19 +97,6 @@ public class Minesweeper extends JPanel implements ActionListener {
 			this.NUMBER_IMAGES[i] = Toolkit.getDefaultToolkit().
 											getImage(Minesweeper.class.getResource(String.format("%s/numbers/number%d_%dx%d.png",
 													res, i + 1, dim, dim)));
-		
-		/*
-		this.SELECT_LVLS = new Image[6];
-		for (int i = 0; i < 3; ++i)
-			this.SELECT_LVLS[i] = Toolkit.getDefaultToolkit().
-									getImage(Minesweeper.class.getResource(String.format("%s/lvls/unselected_lvl%d.png",
-										res, i + 1)));
-		
-		for (int i = 0; i < 3; ++i)
-			this.SELECT_LVLS[i + 3] = Toolkit.getDefaultToolkit().
-										getImage(Minesweeper.class.getResource(String.format("%s/lvls/selected_lvl%d.png",
-											res, i + 1)));
-		*/
 	}
 	
 	public void paintComponent(Graphics gfx) {
@@ -145,12 +132,12 @@ public class Minesweeper extends JPanel implements ActionListener {
 		
 		if (this.mineExploded) {
 			final int IMG_WIDTH = 505;
-			drawX = (this.getWidth() - IMG_WIDTH) / 2;
-			g2d.drawImage(this.GAME_OVER, drawX, 40, null);
+			final int CEN_X = (this.getWidth() - IMG_WIDTH) / 2;
+			g2d.drawImage(this.GAME_OVER, CEN_X, 40, null);
 		} else if (Cell.SafeCells == 0) {
 			final int IMG_WIDTH = 421;
-			drawX = (this.getWidth() - IMG_WIDTH) / 2;
-			g2d.drawImage(this.WIN, drawX, 40, null);
+			final int CEN_X = (this.getWidth() - IMG_WIDTH) / 2;
+			g2d.drawImage(this.WIN, CEN_X, 40, null);
 		}
 	}
 	
@@ -171,7 +158,7 @@ public class Minesweeper extends JPanel implements ActionListener {
 		if (this.cells[y][x].isArmed()) {
 			this.cells[y][x].reveal();
 			this.mineExploded = true;
-			System.out.println("Mines go boom :(...");
+			//System.out.println("Mines go boom :(...");
 			
 			for (Cell[] spotRow : this.cells) {
 				for (Cell cell : spotRow) {
@@ -214,30 +201,26 @@ public class Minesweeper extends JPanel implements ActionListener {
 	}
 	
 	private void revealNeighbours(final Coordinates COORD) {
-		java.util.Queue<Coordinates> q = new LinkedList<>();
+		Queue<Coordinates> q = new LinkedList<>();
 		q.add(COORD);
+
+		this.cells[COORD.y][COORD.x].reveal();
 		
 		while (!q.isEmpty()) {
-			
 			final Coordinates COORDS = q.remove();
-			final int X_CURR = COORDS.x, Y_CURR = COORDS.y;
+			final int X = COORDS.x, Y = COORDS.y;
 			
-			this.cells[Y_CURR][X_CURR].reveal();
-			
-			if (this.cells[Y_CURR][X_CURR].mineValue > 0)
+			if (this.cells[Y][X].mineValue > 0)
 				continue;
 			
 			for (int i = -1; i < 2; ++i) {
 				for (int j = -1; j < 2; ++j) {
-					if (i == 0 && j == 0)
-						continue;
+					final int X_ = X + j, Y_ = Y + i;
+					Coordinates neighbour = new Coordinates(X_, Y_);
 					
-					final int OFFSET_X = X_CURR + j, OFFSET_Y = Y_CURR + i;
-					
-					if (validCoords(OFFSET_X, OFFSET_Y) && //!visited[OFFSET_Y][OFFSET_X] &&
-							!this.cells[OFFSET_Y][OFFSET_X].isRevealed() && !this.cells[OFFSET_Y][OFFSET_X].isArmed()) {
-						q.add(new Coordinates(OFFSET_X, OFFSET_Y));
-						//visited[OFFSET_Y][OFFSET_X] = true;
+					if (validCoords(X_, Y_) && !this.cells[Y_][X_].isRevealed() && this.cells[Y_][X_].isArmed()) {
+						q.add(neighbour);
+						this.cells[Y_][X_].reveal();
 					}
 				}
 			}
