@@ -218,7 +218,7 @@ public class Minesweeper extends JPanel implements ActionListener {
 					final int X_ = X + j, Y_ = Y + i;
 					Coordinates neighbour = new Coordinates(X_, Y_);
 					
-					if (validCoords(X_, Y_) && !this.cells[Y_][X_].isRevealed() && this.cells[Y_][X_].isArmed()) {
+					if (validCoords(X_, Y_) && !this.cells[Y_][X_].isRevealed() && !this.cells[Y_][X_].isArmed()) {
 						q.add(neighbour);
 						this.cells[Y_][X_].reveal();
 					}
