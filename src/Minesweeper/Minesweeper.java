@@ -146,7 +146,7 @@ public class Minesweeper extends JPanel implements ActionListener {
 		int imgWidth, cenX;
 		final int WIN_WIDTH = this.getWidth();
 
-		imgWidth = 480;
+		imgWidth = 477;
 		cenX = (WIN_WIDTH - imgWidth) / 2;
 		for (int i = 0; i < this.SELECT_LVLS.length; ++i)
 			g2d.drawImage(this.SELECT_LVLS[i], cenX, 250 + 100 * i, null);
