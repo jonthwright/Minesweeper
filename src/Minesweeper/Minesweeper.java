@@ -65,11 +65,10 @@ public class Minesweeper extends JPanel implements ActionListener {
 				
 				for (int i = -1; i < 2; ++i) {
 					for (int j = -1; j < 2; ++j) {
-						final int X_NEIGH = X + i;
-						final int Y_NEIGH = Y + j;
+						final int X_ = X + i, Y_ = Y + j;
 						
-						if (validCoords(X_NEIGH, Y_NEIGH))
-							this.cells[Y_NEIGH][X_NEIGH].mineValue++;
+						if (validCoords(X_, Y_))
+							this.cells[Y_][X_].mineValue++;
 					}
 				}
 				
@@ -155,18 +154,7 @@ public class Minesweeper extends JPanel implements ActionListener {
 			return;
 		}
 		
-		if (this.cells[y][x].isArmed()) {
-			this.cells[y][x].reveal();
-			this.mineExploded = true;
-			//System.out.println("Mines go boom :(...");
-			
-			for (Cell[] spotRow : this.cells) {
-				for (Cell cell : spotRow) {
-					if (cell.isArmed()) cell.reveal();
-				}
-			}
-		}
-		
+		this.mineExploded = this.cells[y][x].isArmed();
 	}
 	
 	public void toggleFlagSpot(int x, int y) {
@@ -180,14 +168,14 @@ public class Minesweeper extends JPanel implements ActionListener {
 		return this.cells.length * this.cells[0].length;
 	}
 	
-	public void _newGame(int gameDifficulty) {
+	public void _newGame(Difficulty gameDifficulty) {
 		if (this.getMouseListeners().length == 0)
 			this.addMouseListener(this.CONTROLLER);
 
 		int xSize, ySize, mineCount;
-		if (gameDifficulty == 1) {
+		if (gameDifficulty == Difficulty.EASY) {
 			xSize = ySize = mineCount = 10;
-		} else if (gameDifficulty == 2) {
+		} else if (gameDifficulty ==  Difficulty.MEDIUM) {
 			xSize = ySize = 16;
 			mineCount = 40;
 		} else {

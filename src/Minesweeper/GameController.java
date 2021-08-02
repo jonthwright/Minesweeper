@@ -8,10 +8,11 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 
+
 public class GameController extends JFrame implements MouseInputListener, KeyListener, MouseMotionListener {
 	private final Minesweeper MINESWEEPER;
 	public static int DIM = 30;
-	private int currDiff = 3;
+	private Difficulty currDiff = Difficulty.HARD;
 	
 	public GameController() {
 		this.MINESWEEPER = new Minesweeper(this);
@@ -80,12 +81,12 @@ public class GameController extends JFrame implements MouseInputListener, KeyLis
 		
 		switch (key.getKeyCode()) {
 			case KeyEvent.VK_NUMPAD0, KeyEvent.VK_0 -> this.MINESWEEPER._newGame(this.currDiff);
-			case KeyEvent.VK_NUMPAD1, KeyEvent.VK_1 -> this.MINESWEEPER._newGame(this.currDiff = 1);
-			case KeyEvent.VK_NUMPAD2, KeyEvent.VK_2 -> this.MINESWEEPER._newGame(this.currDiff = 2);
-			case KeyEvent.VK_NUMPAD3, KeyEvent.VK_3 -> this.MINESWEEPER._newGame(this.currDiff = 3);
+			case KeyEvent.VK_NUMPAD1, KeyEvent.VK_1 -> this.MINESWEEPER._newGame(this.currDiff = Difficulty.EASY);
+			case KeyEvent.VK_NUMPAD2, KeyEvent.VK_2 -> this.MINESWEEPER._newGame(this.currDiff = Difficulty.MEDIUM);
+			case KeyEvent.VK_NUMPAD3, KeyEvent.VK_3 -> this.MINESWEEPER._newGame(this.currDiff = Difficulty.HARD);
 		}
 		
-		DIM = (int) (this.MINESWEEPER.getPreferredSize().width/ Math.sqrt(this.MINESWEEPER.numberOfSpots()));
+		this.DIM = (int) (this.MINESWEEPER.getPreferredSize().width / Math.sqrt(this.MINESWEEPER.numberOfSpots()));
 	}
 	
 	@Override
