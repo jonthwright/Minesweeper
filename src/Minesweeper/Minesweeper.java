@@ -21,8 +21,7 @@ public class Minesweeper extends JPanel implements ActionListener {
 		Timer timer = new Timer(0, this);
 		timer.start();
 		
-		int numX = 24;
-		int numY = 24;
+		int gridCount = 24;
 		
 		this.setPreferredSize(new Dimension(721, 721));
 		
@@ -38,7 +37,7 @@ public class Minesweeper extends JPanel implements ActionListener {
 			this.SELECT_LVLS[i] = Toolkit.getDefaultToolkit().
 					getImage(Minesweeper.class.getResource(String.format("/resources/lvls/unselected_lvl%d.png", i + 1)));
 
-		newGame(numX, numY, 99);
+		newGame(gridCount, 99);
 		loadImages(20);
 		
 		this.addMouseListener(this.CONTROLLER = gameController);
@@ -49,13 +48,13 @@ public class Minesweeper extends JPanel implements ActionListener {
 		
 	}
 	
-	private void newGame(int xSpots, int ySpots, int numOfMines){
-		this.cells = new Cell[ySpots][xSpots];
+	private void newGame(int gridCount, int numOfMines){
+		this.cells = new Cell[gridCount][gridCount];
 		this.mineExploded = false;
 		Cell.SafeCells = 0;
 		
-		for (int y = 0; y < this.cells.length; ++y)
-			for (int x = 0; x < this.cells[y].length; ++x)
+		for (int y = 0; y < gridCount; ++y)
+			for (int x = 0; x < gridCount; ++x)
 				this.cells[y][x] = new Cell(x, y);
 
 		generateMines(numOfMines);
@@ -188,7 +187,7 @@ public class Minesweeper extends JPanel implements ActionListener {
 		this.cells[y][x].toggleFlag();
 	}
 	
-	public int numberOfSpots() {
+	public int numberOfCells() {
 		return this.cells.length * this.cells[0].length;
 	}
 	
@@ -200,20 +199,21 @@ public class Minesweeper extends JPanel implements ActionListener {
 		if (this.getMouseListeners().length == 0)
 			this.addMouseListener(this.CONTROLLER);
 
-		int xSize, ySize, mineCount, imgDim;
+		int gridCount, mineCount, imgDim;
 		if (gameDifficulty == Difficulty.EASY) {
-			xSize = ySize = mineCount = 10;
+			gridCount = 10;
+			mineCount = 10;
 		} else if (gameDifficulty ==  Difficulty.MEDIUM) {
-			xSize = ySize = 16;
+			gridCount = 16;
 			mineCount = 40;
 		} else {
-			xSize = ySize = 24;
+			gridCount = 24;
 			mineCount = 99;
 		}
 		
-		imgDim = this.getPreferredSize().width / xSize * 2 / 3;
+		imgDim = this.getPreferredSize().width / gridCount * 2 / 3;
 
-		newGame(xSize, ySize, mineCount);
+		newGame(gridCount, mineCount);
 		loadImages(imgDim);
 	}
 	

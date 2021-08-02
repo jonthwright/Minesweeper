@@ -55,7 +55,7 @@ public class GameController extends JFrame implements MouseInputListener, KeyLis
 			
 			this.MINESWEEPER._newGame(this.currDiff);
 			
-			this.DIM = (int) (this.MINESWEEPER.getPreferredSize().width / Math.sqrt(this.MINESWEEPER.numberOfSpots()));
+			this.DIM = (int) (this.MINESWEEPER.getPreferredSize().width / Math.sqrt(this.MINESWEEPER.numberOfCells()));
 			
 		}
 	}
@@ -101,7 +101,7 @@ public class GameController extends JFrame implements MouseInputListener, KeyLis
 			case KeyEvent.VK_NUMPAD3, KeyEvent.VK_3 -> this.MINESWEEPER._newGame(this.currDiff = Difficulty.HARD);
 		}
 		
-		this.DIM = (int) (this.MINESWEEPER.getPreferredSize().width / Math.sqrt(this.MINESWEEPER.numberOfSpots()));
+		this.DIM = (int) (this.MINESWEEPER.getPreferredSize().width / Math.sqrt(this.MINESWEEPER.numberOfCells()));
 	}
 	
 	@Override
