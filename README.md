@@ -4,11 +4,11 @@ A game of sweeping mines.
 ## Instructions
 
 - **Right Click:** Select cell/option.
-- **Left/Middle Click:** Placed flag (only on unrevealed cell).
-- **0 key:** Reset game with same level difficulty
-- **1 key:** Reset game with _Easy_ level difficulty
-- **2 key:** Reset game with _Medium_ level difficulty
-- **3 key:** Reset game with _Hard_ level difficulty
+- **Left/Middle Click:** Place down/remove flag (only on unrevealed cell).
+- **0 key:** Reset game with same level difficulty.
+- **1 key:** Reset game with _Easy_ level difficulty.
+- **2 key:** Reset game with _Medium_ level difficulty.
+- **3 key:** Reset game with _Hard_ level difficulty.
 
 ## Goal
 
