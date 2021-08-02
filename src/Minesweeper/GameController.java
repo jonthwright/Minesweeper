@@ -36,12 +36,27 @@ public class GameController extends JFrame implements MouseInputListener, KeyLis
 	
 	@Override
 	public void mousePressed(MouseEvent e) {
-		final int X = e.getX() / this.DIM;
-		final int Y = e.getY() / this.DIM;
+		int X = e.getX();
+		int Y = e.getY();
 		
-		switch (e.getButton()) {
-			case MouseEvent.BUTTON1 -> this.MINESWEEPER.selectSpot(X, Y);
-			case MouseEvent.BUTTON2, MouseEvent.BUTTON3 -> this.MINESWEEPER.toggleFlagSpot(X, Y);
+		if (!this.MINESWEEPER.isMineExploded() && Cell.SafeCells > 0) {
+			X /= this.DIM;
+			Y /= this.DIM;
+			
+			switch (e.getButton()) {
+				case MouseEvent.BUTTON1 -> this.MINESWEEPER.selectSpot(X, Y);
+				case MouseEvent.BUTTON2, MouseEvent.BUTTON3 -> this.MINESWEEPER.toggleFlagSpot(X, Y);
+			}
+		} else if (100 <= X && X < 620) {
+			if (240 <= Y && Y < 330) this.currDiff = Difficulty.EASY;
+			else if (340 <= Y && Y < 430) this.currDiff = Difficulty.MEDIUM;
+			else if (440 <= Y && Y < 530) this.currDiff = Difficulty.HARD;
+			else if (615 <= Y && Y < 700) System.exit(0);
+			
+			this.MINESWEEPER._newGame(this.currDiff);
+			
+			this.DIM = (int) (this.MINESWEEPER.getPreferredSize().width / Math.sqrt(this.MINESWEEPER.numberOfSpots()));
+			
 		}
 	}
 	
