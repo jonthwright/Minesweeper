@@ -12,10 +12,11 @@ public class Minesweeper extends JPanel implements ActionListener {
 	
 	private Cell[][] cells;
 	private Image FLAG_IMAGE, MINE_IMAGE, EXPLOSION_IMAGE;
-	private Image GAME_OVER, WIN;
+	private Image GAME_OVER_IMG, YOU_WIN_IMG;
 	private Image[] NUMBER_IMAGES, SELECT_LVLS;
 	private final GameController CONTROLLER;
 	private boolean mineExploded;
+	private int selection = -1;
 	
 	public Minesweeper(GameController gameController) {
 		Timer timer = new Timer(0, this);
@@ -25,6 +26,11 @@ public class Minesweeper extends JPanel implements ActionListener {
 		int numY = 24;
 		
 		this.setPreferredSize(new Dimension(721, 721));
+		
+		this.YOU_WIN_IMG = Toolkit.getDefaultToolkit().
+				getImage(Minesweeper.class.getResource("/resources/lvls/winning.png"));
+		this.GAME_OVER_IMG = Toolkit.getDefaultToolkit().
+				getImage(Minesweeper.class.getResource("/resources/lvls/gameover.png"));
 
 		newGame(numX, numY, 99);
 		loadImages(20);
@@ -38,18 +44,15 @@ public class Minesweeper extends JPanel implements ActionListener {
 	}
 	
 	private void newGame(int xSpots, int ySpots, int numOfMines){
-		this.mineExploded = false;
-		generateCells(xSpots, ySpots);
-		generateMines(numOfMines);
-	}
-	
-	private void generateCells(int xSpots, int ySpots) {
 		this.cells = new Cell[ySpots][xSpots];
+		this.mineExploded = false;
 		Cell.SafeCells = 0;
+		
+		for (int y = 0; y < this.cells.length; ++y)
+			for (int x = 0; x < this.cells[y].length; ++x)
+				this.cells[y][x] = new Cell(x, y);
 
-		for (int i = 0; i < this.cells.length; ++i)
-			for (int j = 0; j < this.cells[i].length; ++j)
-				this.cells[i][j] = new Cell(j, i);
+		generateMines(numOfMines);
 	}
 	
 	private void generateMines(int numOfMines) {
@@ -79,23 +82,25 @@ public class Minesweeper extends JPanel implements ActionListener {
 	
 	private void loadImages(int dim) {
 		String res = "/resources";
-
+		
 		this.FLAG_IMAGE = Toolkit.getDefaultToolkit().
 				getImage(Minesweeper.class.getResource(String.format("%s/misc/flag_%dx%d.png", res, dim, dim)));
 		this.MINE_IMAGE = Toolkit.getDefaultToolkit().
 				getImage(Minesweeper.class.getResource(String.format("%s/misc/mine_%dx%d.png", res, dim, dim)));
 		this.EXPLOSION_IMAGE = Toolkit.getDefaultToolkit().
 				getImage(Minesweeper.class.getResource(String.format("%s/misc/explosion_%dx%d.png", res, dim, dim)));
-		this.WIN = Toolkit.getDefaultToolkit().
-				getImage(Minesweeper.class.getResource(res + "/lvls/winning.png"));
-		this.GAME_OVER = Toolkit.getDefaultToolkit().
-				getImage(Minesweeper.class.getResource(res + "/lvls/gameover.png"));
 		
 		this.NUMBER_IMAGES = new Image[8];
 		for (int i = 0; i < 8; ++i)
 			this.NUMBER_IMAGES[i] = Toolkit.getDefaultToolkit().
-											getImage(Minesweeper.class.getResource(String.format("%s/numbers/number%d_%dx%d.png",
-													res, i + 1, dim, dim)));
+					getImage(Minesweeper.class.getResource(String.format("%s/numbers/number%d_%dx%d.png",
+							res, i + 1, dim, dim)));
+
+		this.NUMBER_IMAGES = new Image[8];
+		for (int i = 0; i < 8; ++i)
+			this.NUMBER_IMAGES[i] = Toolkit.getDefaultToolkit().
+					getImage(Minesweeper.class.getResource(String.format("%s/numbers/number%d_%dx%d.png",
+							res, i + 1, dim, dim)));
 	}
 	
 	public void paintComponent(Graphics gfx) {
@@ -105,8 +110,8 @@ public class Minesweeper extends JPanel implements ActionListener {
 		final int DIM = this.getPreferredSize().width / this.cells.length;
 		int drawX, drawY;
 		
-		for (Cell[] spotRow : this.cells) {
-			for (Cell cell : spotRow) {
+		for (Cell[] cellRow : this.cells) {
+			for (Cell cell : cellRow) {
 				drawX = DIM * cell.x + DIM * 3 / 16;
 				drawY = DIM * cell.y + DIM * 3 / 16;
 				
@@ -129,14 +134,18 @@ public class Minesweeper extends JPanel implements ActionListener {
 			}
 		}
 		
+		drawGameScreen(g2d);
+	}
+	
+	private void drawGameScreen(Graphics2D g2d) {
 		if (this.mineExploded) {
 			final int IMG_WIDTH = 505;
 			final int CEN_X = (this.getWidth() - IMG_WIDTH) / 2;
-			g2d.drawImage(this.GAME_OVER, CEN_X, 40, null);
+			g2d.drawImage(this.GAME_OVER_IMG, CEN_X, 40, null);
 		} else if (Cell.SafeCells == 0) {
 			final int IMG_WIDTH = 421;
 			final int CEN_X = (this.getWidth() - IMG_WIDTH) / 2;
-			g2d.drawImage(this.WIN, CEN_X, 40, null);
+			g2d.drawImage(this.YOU_WIN_IMG, CEN_X, 40, null);
 		}
 	}
 	
@@ -172,7 +181,7 @@ public class Minesweeper extends JPanel implements ActionListener {
 		if (this.getMouseListeners().length == 0)
 			this.addMouseListener(this.CONTROLLER);
 
-		int xSize, ySize, mineCount;
+		int xSize, ySize, mineCount, imgDim;
 		if (gameDifficulty == Difficulty.EASY) {
 			xSize = ySize = mineCount = 10;
 		} else if (gameDifficulty ==  Difficulty.MEDIUM) {
@@ -183,9 +192,10 @@ public class Minesweeper extends JPanel implements ActionListener {
 			mineCount = 99;
 		}
 		
-		//this.setPreferredSize(new Dimension(xSize * 30, ySize * 30));
+		imgDim = this.getPreferredSize().width / xSize * 2 / 3;
+
 		newGame(xSize, ySize, mineCount);
-		loadImages(this.getPreferredSize().width / xSize * 2 / 3);
+		loadImages(imgDim);
 	}
 	
 	private void revealNeighbours(final Coordinates COORD) {
@@ -217,5 +227,4 @@ public class Minesweeper extends JPanel implements ActionListener {
 	private boolean validCoords(final int X, final int Y) {
 		return X >= 0 && Y >= 0 && Y < this.cells.length && X < this.cells[Y].length;
 	}
-	
 }

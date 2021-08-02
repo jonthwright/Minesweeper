@@ -10,8 +10,8 @@ import java.awt.event.MouseMotionListener;
 
 
 public class GameController extends JFrame implements MouseInputListener, KeyListener, MouseMotionListener {
+	private int DIM = 30;
 	private final Minesweeper MINESWEEPER;
-	public static int DIM = 30;
 	private Difficulty currDiff = Difficulty.HARD;
 	
 	public GameController() {
@@ -36,12 +36,12 @@ public class GameController extends JFrame implements MouseInputListener, KeyLis
 	
 	@Override
 	public void mousePressed(MouseEvent e) {
-		final int X_MOUSE = e.getX() / DIM;
-		final int Y_MOUSE = e.getY() / DIM;
+		final int X = e.getX() / this.DIM;
+		final int Y = e.getY() / this.DIM;
 		
 		switch (e.getButton()) {
-			case MouseEvent.BUTTON1 -> this.MINESWEEPER.selectSpot(X_MOUSE, Y_MOUSE);
-			case MouseEvent.BUTTON2, MouseEvent.BUTTON3 -> this.MINESWEEPER.toggleFlagSpot(X_MOUSE, Y_MOUSE);
+			case MouseEvent.BUTTON1 -> this.MINESWEEPER.selectSpot(X, Y);
+			case MouseEvent.BUTTON2, MouseEvent.BUTTON3 -> this.MINESWEEPER.toggleFlagSpot(X, Y);
 		}
 	}
 	
