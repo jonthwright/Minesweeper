@@ -20,7 +20,6 @@ public class Minesweeper extends JPanel implements ActionListener {
 	private BufferedImage[] NUMBER_IMAGES, SELECT_LVLS;
 	private final GameController CONTROLLER;
 	private boolean mineExploded;
-	final String RESRC_DIR = "src/resources";
 	
 	public Minesweeper(GameController gameController) {
 		Timer timer = new Timer(0, this);
@@ -33,12 +32,12 @@ public class Minesweeper extends JPanel implements ActionListener {
 		this.NUMBER_IMAGES = new BufferedImage[8];
 
 		try {
-			this.YOU_WIN_IMG = ImageIO.read(new File(this.RESRC_DIR + "/lvls/winning.png"));
-			this.GAME_OVER_IMG = ImageIO.read(new File(this.RESRC_DIR + "/lvls/gameover.png"));
-			this.EXIT_IMG = ImageIO.read(new File(this.RESRC_DIR + "/lvls/exit.png"));
+			this.YOU_WIN_IMG = ImageIO.read(new File("resources/lvls/winning.png"));
+			this.GAME_OVER_IMG = ImageIO.read(new File("resources/lvls/gameover.png"));
+			this.EXIT_IMG = ImageIO.read(new File("resources/lvls/exit.png"));
 			
 			for (int i = 0; i < this.SELECT_LVLS.length; ++i)
-				this.SELECT_LVLS[i] = ImageIO.read(new File(String.format("%s/lvls/unselected_lvl%d.png", this.RESRC_DIR, i + 1)));
+				this.SELECT_LVLS[i] = ImageIO.read(new File("resources/lvls/unselected_lvl" + (i + 1) + ".png"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -94,13 +93,13 @@ public class Minesweeper extends JPanel implements ActionListener {
 	
 	private void loadImages(int dim) {
 		try {
-			this.FLAG_IMG = ImageIO.read(new File(String.format("%s/misc/flag_%dx%d.png", this.RESRC_DIR, dim, dim)));
-			this.MINE_IMG = ImageIO.read(new File(String.format("%s/misc/mine_%dx%d.png", this.RESRC_DIR, dim, dim)));
-			//this.EXPLODE_IMG = ImageIO.read(new File(String.format("%s/misc/explosion_%dx%d.png", this.RESRC_DIR, dim, dim)));
+			this.FLAG_IMG = ImageIO.read(new File(String.format("resources/misc/flag_%dx%d.png", dim, dim)));
+			this.MINE_IMG = ImageIO.read(new File(String.format("resources/misc/mine_%dx%d.png", dim, dim)));
+			//this.EXPLODE_IMG = ImageIO.read(new File(String.format("resources/misc/explosion_%dx%d.png", dim, dim)));
 			
 			for (int i = 0; i < 8; ++i)
-				this.NUMBER_IMAGES[i] = ImageIO.read(new File(String.format("%s/numbers/number%d_%dx%d.png",
-						this.RESRC_DIR, i + 1, dim, dim)));
+				this.NUMBER_IMAGES[i] = ImageIO.read(new File(String.format("resources/numbers/number%d_%dx%d.png",
+						i + 1, dim, dim)));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

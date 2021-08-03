@@ -1,5 +1,6 @@
 package Minesweeper;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.MouseInputListener;
 import java.awt.*;
@@ -7,6 +8,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
+import java.io.File;
+import java.io.IOException;
 
 
 public class GameController extends JFrame implements MouseInputListener, KeyListener, MouseMotionListener {
@@ -22,8 +25,12 @@ public class GameController extends JFrame implements MouseInputListener, KeyLis
 		
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		this.setIconImage(Toolkit.getDefaultToolkit().
-				getImage(GameController.class.getResource("/resources/icons/mine_ex_icon.png")));
+		try {
+			this.setIconImage(ImageIO.read(new File("resources/icons/mine_ex_icon.png")));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 		this.setResizable(false);
 		this.setVisible(true);
 		this.pack();
