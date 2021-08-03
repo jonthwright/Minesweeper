@@ -27,12 +27,11 @@ public class Minesweeper extends JPanel implements ActionListener {
 
 		this.setPreferredSize(new Dimension(721, 721));
 		
-		int gridCount = 24;
 		this.SELECT_LVLS = new BufferedImage[3];
 		this.NUMBER_IMAGES = new BufferedImage[8];
 
 		try {
-			this.YOU_WIN_IMG = ImageIO.read(new File("resources/lvls/winning.png"));
+			this.YOU_WIN_IMG = ImageIO.read(new File("resources/lvls/you_win.png"));
 			this.GAME_OVER_IMG = ImageIO.read(new File("resources/lvls/gameover.png"));
 			this.EXIT_IMG = ImageIO.read(new File("resources/lvls/exit.png"));
 			
@@ -42,8 +41,7 @@ public class Minesweeper extends JPanel implements ActionListener {
 			e.printStackTrace();
 		}
 		
-
-		newGame(gridCount, 99);
+		newGame(24, 99);
 		loadImages(20);
 		
 		this.addMouseListener(this.CONTROLLER = gameController);
@@ -109,7 +107,7 @@ public class Minesweeper extends JPanel implements ActionListener {
 		super.paintComponent(gfx);
 		Graphics2D g2d = (Graphics2D) gfx;
 		
-		final int DIM = this.getPreferredSize().width / this.cells.length;
+		final int DIM = this.getWidth() / this.cells.length;
 		int drawX, drawY;
 		
 		for (Cell[] cellRow : this.cells) {
@@ -208,7 +206,7 @@ public class Minesweeper extends JPanel implements ActionListener {
 			mineCount = 99;
 		}
 		
-		imgDim = this.getPreferredSize().width / gridCount * 2 / 3;
+		imgDim = this.getWidth() / gridCount * 2 / 3;
 
 		newGame(gridCount, mineCount);
 		loadImages(imgDim);

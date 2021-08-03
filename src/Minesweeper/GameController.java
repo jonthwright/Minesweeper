@@ -3,7 +3,6 @@ package Minesweeper;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.MouseInputListener;
-import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -15,7 +14,7 @@ import java.io.IOException;
 public class GameController extends JFrame implements MouseInputListener, KeyListener, MouseMotionListener {
 	private int DIM = 30;
 	private final Minesweeper MINESWEEPER;
-	private Difficulty currDiff = Difficulty.HARD;
+	private static Difficulty currDiff = Difficulty.HARD;
 	
 	public GameController() {
 		this.MINESWEEPER = new Minesweeper(this);
@@ -62,7 +61,7 @@ public class GameController extends JFrame implements MouseInputListener, KeyLis
 			
 			this.MINESWEEPER._newGame(this.currDiff);
 			
-			this.DIM = (int) (this.MINESWEEPER.getPreferredSize().width / Math.sqrt(this.MINESWEEPER.numberOfCells()));
+			this.DIM = (int) (this.MINESWEEPER.getWidth() / Math.sqrt(this.MINESWEEPER.numberOfCells()));
 			
 		}
 	}
