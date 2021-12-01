@@ -2,3 +2,7 @@
 .png
 out
 *.iml
+*.m4a
+resources/lvls/selected_lvl1.png
+resources/lvls/selected_lvl2.png
+resources/lvls/selected_lvl3.png
